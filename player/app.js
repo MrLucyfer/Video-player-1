@@ -1,3 +1,5 @@
+const { ipcRenderer } = require('electron')
+
 const videoContainer = document.querySelector('.video-container');
 const video = document.querySelector('.video-container video');
 
@@ -20,6 +22,8 @@ const title = document.querySelector('.video-container .controls .title .series'
 const progressBar = document.querySelector('.video-container .progress-controls .progress-bar');
 const watchedBar = document.querySelector('.video-container .progress-controls .progress-bar .watched-bar');
 const timeLeft = document.querySelector('.video-container .progress-controls .time-remaining');
+const hyperlinkButton  = document.querySelector('.video-container .controls .hyperlink-button');
+
 
 let controlsTimeout;
 controlsContainer.style.opacity = '0';
@@ -137,12 +141,8 @@ document.addEventListener('mousemove', () => {
 });
 
 document.addEventListener('mousedown', (event) => {
-  
-  if(event.detail == 2) {
-    toggleFullScreen();
-  }
-  else if(event.detail == 1) {
-    if(event.path[0].localName == 'video' || event.path[0].className == 'controls-container') {
+ if(event.detail == 1) {
+    if(event.path[0].localName == 'video') {
       playPause();
     }
   }
@@ -150,6 +150,15 @@ document.addEventListener('mousedown', (event) => {
 
 video.addEventListener('timeupdate', () => {
   calculateTime();
+});
+
+hyperlinkButton.addEventListener('click', (event) => {
+  console.log('Polete TKM')
+  ipcRenderer.send('input', 'in');
+});
+
+ipcRenderer.on('input-res', (event, arg) => {
+  video.src = arg;
 });
 
 progressBar.addEventListener('click', (event) => {
@@ -192,8 +201,4 @@ document.addEventListener('dragenter', (event) => {
 
 document.addEventListener('dragleave', (event) => { 
   console.log('File has left the Drop Space'); 
-});
-
-ipc.on('open-file', function(filepath) {
-  alert(filepath);
 });
